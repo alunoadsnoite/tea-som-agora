@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name" translatable="false">TEA Som Agora</string>
+    <string name="title">Comparar ruído</string>
+    <string name="introduction">Meça o som por 10 segundos em dois lugares. Mantenha o celular na mesma posição e evite falar durante a medição.</string>
+    <string name="privacy">O microfone funciona só durante a medição. O app funciona offline e não salva áudio.</string>
+    <string name="point_a">Ponto A</string>
+    <string name="point_b">Ponto B</string>
+    <string name="start_a">Medir ponto A</string>
+    <string name="start_b">Medir ponto B</string>
+    <string name="retry_a">Medir A novamente</string>
+    <string name="retry_b">Medir B novamente</string>
+    <string name="measured">Medição concluída</string>
+    <string name="waiting">Aguardando medição</string>
+    <string name="seconds_left">%1$d s restantes</string>
+    <string name="measuring">Medindo %1$s</string>
+    <string name="cancel">Cancelar medição</string>
+    <string name="reset">Encerrar comparação</string>
+    <string name="less_a">Menos som captado no ponto A</string>
+    <string name="less_b">Menos som captado no ponto B</string>
+    <string name="inconclusive">Diferença inconclusiva</string>
+    <string name="inconclusive_detail">Os níveis captados foram próximos. Você pode repetir a medição.</string>
+    <string name="comparison_detail">Comparação relativa, feita com o mesmo celular.</string>
+    <string name="mismatch">O microfone usado mudou. Repita os dois pontos com a mesma entrada de áudio.</string>
+    <string name="permission_denied">Para medir o som, permita o acesso ao microfone. Você também pode liberar a permissão nos ajustes do app.</string>
+    <string name="settings">Abrir ajustes do app</string>
+    <string name="capture_error">Não foi possível medir o som. Confira se o microfone está disponível e tente novamente.</string>
+    <string name="input_changed">A entrada de áudio mudou durante a medição. Tente novamente com a mesma entrada nos dois pontos.</string>
+    <string name="clipping">O sinal ficou forte demais para comparar. Tente medir novamente.</string>
+    <string name="contact_email" translatable="false">valdenor.sa@proton.me</string>
+    <string name="back">Voltar</string>
+    <string name="settings_title">Configurações</string>
+    <string name="theme">Aparência</string>
+    <string name="light">Claro</string>
+    <string name="dark">Escuro</string>
+    <string name="automatic">Automático</string>
+    <string name="language">Idioma</string>
+    <string name="support">Apoio voluntário</string>
+    <string name="support_detail">O apoio é opcional. Nenhum pagamento é feito no app.</string>
+    <string name="sponsors">Abrir GitHub Sponsors</string>
+    <string name="copy_pix">Copiar chave Pix aleatória</string>
+    <string name="pix_copied">Chave Pix copiada.</string>
+    <string name="copy_error">Não foi possível copiar a chave Pix.</string>
+    <string name="link_error">Não foi possível abrir o GitHub Sponsors.</string>
+    <string name="contact">Contato com o desenvolvedor</string>
+    <string name="write_email">Escrever e-mail</string>
+    <string name="email_error">Não foi possível abrir um app de e-mail.</string>
+    <string name="lower_intensity">Menor intensidade</string>
+    <string name="higher_intensity">Maior intensidade</string>
+</resources>
