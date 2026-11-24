@@ -1,6 +1,7 @@
 <resources>
     <string name="title">Comparar ruido</string>
-    <string name="introduction">Mide el sonido durante 10 segundos en dos lugares. Mantén el teléfono en la misma posición y evita hablar durante la medición.</string>
+    <string name="introduction">Mide durante 10 segundos en cada lugar. Mantén el teléfono en una posición y orientación similares, no cubras el micrófono, evita hablar y no cambies la entrada de audio ni los accesorios.</string>
+    <string name="measurement_guidance">Mantén el teléfono quieto, no cubras el micrófono ni cambies la entrada de audio o los accesorios.</string>
     <string name="privacy">El micrófono solo se activa durante la medición. La app funciona sin conexión y no guarda audio.</string>
     <string name="point_a">Punto A</string>
     <string name="point_b">Punto B</string>
@@ -14,12 +15,17 @@
     <string name="measuring">Midiendo %1$s</string>
     <string name="cancel">Cancelar medición</string>
     <string name="reset">Terminar comparación</string>
-    <string name="less_a">Menos sonido captado en el punto A</string>
-    <string name="less_b">Menos sonido captado en el punto B</string>
     <string name="inconclusive">Diferencia no concluyente</string>
-    <string name="inconclusive_detail">Los niveles captados fueron similares. Puedes repetir la medición.</string>
+    <string name="inconclusive_detail">Los niveles fueron similares. Si quieres, repite uno o ambos puntos para comprobar la consistencia.</string>
+    <string name="inconsistent">Las mediciones variaron; no hay un resultado claro.</string>
+    <string name="inconsistent_detail">Las mediciones repetidas no fueron consistentes. Puedes volver a medir uno o ambos puntos.</string>
+    <string name="repeat_a">Repetir A</string>
+    <string name="repeat_b">Repetir B</string>
+    <string name="repeat_both">Repetir ambos puntos</string>
+    <string name="point_label">Nombre de %1$s (opcional)</string>
+    <string name="less_at_point">Menos sonido captado en %1$s</string>
     <string name="comparison_detail">Comparación relativa con el mismo teléfono.</string>
-    <string name="mismatch">El micrófono cambió. Vuelve a medir los dos puntos con la misma entrada de audio.</string>
+    <string name="mismatch">No se pudo confirmar la misma entrada de audio en ambos puntos. Comprueba la conexión y vuelve a medir.</string>
     <string name="permission_denied">Permite el acceso al micrófono para medir el sonido. También puedes conceder el permiso en los ajustes de la app.</string>
     <string name="settings">Abrir ajustes de la app</string>
     <string name="capture_error">No se pudo medir el sonido. Comprueba si el micrófono está disponible e inténtalo de nuevo.</string>

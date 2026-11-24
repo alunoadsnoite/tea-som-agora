@@ -47,7 +47,7 @@ internal class SoundRecorder(context: Context) {
         val buffer = ShortArray(windowSize)
         val summary = SoundWindows(windowSize)
         val targetSamples = sampleRate * MEASUREMENT_SECONDS
-        var inputId: Int? = null
+        val route = AudioRouteTracker()
         var lastSeconds = MEASUREMENT_SECONDS
 
         try {
@@ -75,10 +75,9 @@ internal class SoundRecorder(context: Context) {
                     throw CaptureException(CaptureProblem.UNAVAILABLE)
                 }
                 val routedId = recorder.routedDevice?.id
-                if (inputId != null && routedId != inputId) {
+                if (!route.observe(routedId)) {
                     throw CaptureException(CaptureProblem.INPUT_CHANGED)
                 }
-                inputId = routedId
 
                 summary.add(buffer, count)
                 buffer.fill(0, 0, count)
@@ -90,7 +89,7 @@ internal class SoundRecorder(context: Context) {
             }
             if (summary.isClipped) throw CaptureException(CaptureProblem.CLIPPED)
             val level = summary.level() ?: throw CaptureException(CaptureProblem.UNAVAILABLE)
-            return SoundReading(level, inputId)
+            return SoundReading(level, route.inputId)
         } finally {
             buffer.fill(0)
             try {

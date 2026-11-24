@@ -1,6 +1,7 @@
 <resources>
     <string name="title">Comparer le bruit</string>
-    <string name="introduction">Mesurez le son pendant 10 secondes à deux endroits. Gardez le téléphone dans la même position et évitez de parler pendant la mesure.</string>
+    <string name="introduction">Mesurez pendant 10 secondes à chaque endroit. Gardez le téléphone dans une position et une orientation similaires, ne couvrez pas le microphone, évitez de parler et ne changez pas d’entrée audio ni d’accessoires.</string>
+    <string name="measurement_guidance">Gardez le téléphone immobile, ne couvrez pas le microphone et ne changez pas d’entrée audio ni d’accessoires.</string>
     <string name="privacy">Le microphone fonctionne uniquement pendant la mesure. L’application fonctionne hors ligne et ne conserve aucun son.</string>
     <string name="point_a">Point A</string>
     <string name="point_b">Point B</string>
@@ -14,12 +15,17 @@
     <string name="measuring">Mesure au %1$s</string>
     <string name="cancel">Annuler la mesure</string>
     <string name="reset">Terminer la comparaison</string>
-    <string name="less_a">Moins de bruit capté au point A</string>
-    <string name="less_b">Moins de bruit capté au point B</string>
     <string name="inconclusive">Différence non concluante</string>
-    <string name="inconclusive_detail">Les niveaux captés étaient proches. Vous pouvez recommencer la mesure.</string>
+    <string name="inconclusive_detail">Les niveaux étaient proches. Si vous le souhaitez, remesurez un ou les deux points pour vérifier la cohérence.</string>
+    <string name="inconsistent">Les mesures varient ; aucun résultat clair.</string>
+    <string name="inconsistent_detail">Les mesures répétées ne sont pas cohérentes. Vous pouvez remesurer un ou les deux points.</string>
+    <string name="repeat_a">Remesurer A</string>
+    <string name="repeat_b">Remesurer B</string>
+    <string name="repeat_both">Remesurer les deux points</string>
+    <string name="point_label">Nom du %1$s (facultatif)</string>
+    <string name="less_at_point">Moins de son capté au %1$s</string>
     <string name="comparison_detail">Comparaison relative avec le même téléphone.</string>
-    <string name="mismatch">Le microphone a changé. Remesurez les deux points avec la même entrée audio.</string>
+    <string name="mismatch">Impossible de confirmer la même entrée audio aux deux points. Vérifiez la connexion et recommencez.</string>
     <string name="permission_denied">Autorisez l’accès au microphone pour mesurer le son. Vous pouvez aussi donner cette autorisation dans les paramètres de l’application.</string>
     <string name="settings">Ouvrir les paramètres de l’application</string>
     <string name="capture_error">Impossible de mesurer le son. Vérifiez que le microphone est disponible et réessayez.</string>

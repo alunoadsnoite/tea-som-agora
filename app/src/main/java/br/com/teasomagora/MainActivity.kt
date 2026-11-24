@@ -39,6 +39,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -72,13 +73,17 @@ import kotlin.math.pow
 class MainActivity : ComponentActivity() {
     private val measurement by viewModels<MeasurementViewModel>()
     private var pendingPermission by mutableStateOf<Point?>(null)
+    private var pendingRepeatBoth by mutableStateOf(false)
 
     private val microphonePermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
         val point = pendingPermission
         pendingPermission = null
-        if (granted && point != null) measurement.start(point)
+        val repeatBoth = pendingRepeatBoth
+        pendingRepeatBoth = false
+        if (granted && repeatBoth) measurement.repeatBoth()
+        else if (granted && point != null) measurement.start(point)
         if (!granted) measurement.permissionDenied()
     }
 
@@ -89,6 +94,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingPermission = savedInstanceState?.getString("permissionPoint")?.let(Point::valueOf)
+        pendingRepeatBoth = savedInstanceState?.getBoolean("pendingRepeatBoth") ?: false
         val preferences = AppPreferences(this)
 
         setContent {
@@ -178,6 +184,7 @@ class MainActivity : ComponentActivity() {
                                 state = measurement,
                                 permissionPending = pendingPermission != null,
                                 onMeasure = ::requestMeasurement,
+                                onRepeatBoth = ::requestRepeatBoth,
                                 onSettings = {
                                     launchExternal(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)))
                                 },
@@ -192,6 +199,7 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("permissionPoint", pendingPermission?.name)
+        outState.putBoolean("pendingRepeatBoth", pendingRepeatBoth)
     }
 
     override fun onStop() {
@@ -205,6 +213,17 @@ class MainActivity : ComponentActivity() {
             measurement.start(point)
         } else {
             pendingPermission = point
+            microphonePermission.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    private fun requestRepeatBoth() {
+        if (pendingPermission != null || measurement.active != null) return
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            measurement.repeatBoth()
+        } else {
+            pendingPermission = Point.A
+            pendingRepeatBoth = true
             microphonePermission.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
@@ -247,22 +266,26 @@ private fun MeasurementContent(
     state: MeasurementViewModel,
     permissionPending: Boolean,
     onMeasure: (Point) -> Unit,
+    onRepeatBoth: () -> Unit,
     onSettings: () -> Unit,
 ) {
     val pointA = state.pointA
     val pointB = state.pointB
     val active = state.active
-    val comparison = if (pointA != null && pointB != null) compare(pointA, pointB) else null
+    val labelA = state.labelA.trim().ifEmpty { stringResource(R.string.point_a) }
+    val labelB = state.labelB.trim().ifEmpty { stringResource(R.string.point_b) }
+    val comparison = aggregateComparisons(state.rounds)
 
     SectionHeading(stringResource(R.string.title))
     if (comparison == null) {
         Text(stringResource(R.string.introduction))
     } else if (active == null) {
         val result = when (comparison) {
-            Comparison.A_QUIETER -> R.string.less_a
-            Comparison.B_QUIETER -> R.string.less_b
-            Comparison.INCONCLUSIVE -> R.string.inconclusive
-            Comparison.DIFFERENT_INPUT -> R.string.mismatch
+            Comparison.A_QUIETER -> stringResource(R.string.less_at_point, labelA)
+            Comparison.B_QUIETER -> stringResource(R.string.less_at_point, labelB)
+            Comparison.INCONCLUSIVE -> stringResource(R.string.inconclusive)
+            Comparison.INCONSISTENT -> stringResource(R.string.inconsistent)
+            Comparison.DIFFERENT_INPUT -> stringResource(R.string.mismatch)
         }
         Card(
             modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
@@ -271,14 +294,38 @@ private fun MeasurementContent(
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
         ) {
-            Text(stringResource(result), Modifier.padding(18.dp), style = MaterialTheme.typography.titleLarge)
+            Text(result, Modifier.padding(18.dp), style = MaterialTheme.typography.titleLarge)
         }
-        if (comparison == Comparison.INCONCLUSIVE) Text(stringResource(R.string.inconclusive_detail))
+        when (comparison) {
+            Comparison.INCONCLUSIVE -> Text(stringResource(R.string.inconclusive_detail))
+            Comparison.INCONSISTENT -> Text(stringResource(R.string.inconsistent_detail))
+            else -> Unit
+        }
+        if (comparison == Comparison.INCONCLUSIVE || comparison == Comparison.INCONSISTENT) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedButton(
+                    onClick = { onMeasure(Point.A) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                ) { Text(stringResource(R.string.repeat_a)) }
+                OutlinedButton(
+                    onClick = { onMeasure(Point.B) },
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                ) { Text(stringResource(R.string.repeat_b)) }
+            }
+            OutlinedButton(
+                onClick = onRepeatBoth,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            ) { Text(stringResource(R.string.repeat_both)) }
+        }
     }
 
     if (active != null) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.measuring, stringResource(active.label)), Modifier.semantics {
+            val activeLabel = if (active == Point.A) labelA else labelB
+            Text(stringResource(R.string.measuring, activeLabel), Modifier.semantics {
                 liveRegion = LiveRegionMode.Polite
             })
             LinearProgressIndicator(
@@ -286,6 +333,7 @@ private fun MeasurementContent(
                 modifier = Modifier.fillMaxWidth(),
             )
             Text(stringResource(R.string.seconds_left, state.secondsLeft))
+            Text(stringResource(R.string.measurement_guidance))
             OutlinedButton(onClick = state::cancel, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                 Text(stringResource(R.string.cancel))
             }
@@ -314,8 +362,30 @@ private fun MeasurementContent(
         relative(pointA) to relative(pointB)
     } else null
 
-    PointCard(Point.A, pointA, enabled, pointA == null, relativeLevels?.first, onMeasure)
-    PointCard(Point.B, pointB, enabled && pointA != null, pointA != null && pointB == null, relativeLevels?.second, onMeasure)
+    PointCard(
+        point = Point.A,
+        pointLabel = labelA,
+        labelValue = state.labelA,
+        reading = pointA,
+        enabled = enabled,
+        canEditLabel = active == null,
+        primary = pointA == null,
+        relativeLevel = relativeLevels?.first,
+        onMeasure = onMeasure,
+        onLabelChange = { state.setLabel(Point.A, it) },
+    )
+    PointCard(
+        point = Point.B,
+        pointLabel = labelB,
+        labelValue = state.labelB,
+        reading = pointB,
+        enabled = enabled && pointA != null,
+        canEditLabel = active == null,
+        primary = pointA != null && pointB == null,
+        relativeLevel = relativeLevels?.second,
+        onMeasure = onMeasure,
+        onLabelChange = { state.setLabel(Point.B, it) },
+    )
 
     if (comparison != null) Text(stringResource(R.string.comparison_detail), style = MaterialTheme.typography.bodyMedium)
     if (pointA != null || pointB != null) {
@@ -330,11 +400,15 @@ private fun MeasurementContent(
 @Composable
 private fun PointCard(
     point: Point,
+    pointLabel: String,
+    labelValue: String,
     reading: SoundReading?,
     enabled: Boolean,
+    canEditLabel: Boolean,
     primary: Boolean,
     relativeLevel: Float?,
     onMeasure: (Point) -> Unit,
+    onLabelChange: (String) -> Unit,
 ) {
     val action = when (point) {
         Point.A -> if (reading == null) R.string.start_a else R.string.retry_a
@@ -342,7 +416,16 @@ private fun PointCard(
     }
     OutlinedCard(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionHeading(stringResource(point.label), large = false)
+            SectionHeading(pointLabel, large = false)
+            OutlinedTextField(
+                value = labelValue,
+                onValueChange = onLabelChange,
+                label = { Text(stringResource(R.string.point_label, stringResource(point.label))) },
+                placeholder = { Text(stringResource(point.label)) },
+                singleLine = true,
+                enabled = canEditLabel,
+                modifier = Modifier.fillMaxWidth(),
+            )
             val label = when {
                 relativeLevel == 1f -> R.string.higher_intensity
                 relativeLevel != null -> R.string.lower_intensity
