@@ -21,8 +21,93 @@ class SoundComparisonTest {
     }
 
     @Test
+    fun exactMarginIsInconclusiveButDifferenceBeyondMarginIsDecisive() {
+        assertEquals(Comparison.INCONCLUSIVE, compare(SoundReading(-33.0, 2), SoundReading(-30.0, 2)))
+        assertEquals(Comparison.A_QUIETER, compare(SoundReading(-33.01, 2), SoundReading(-30.0, 2)))
+        assertEquals(Comparison.INCONCLUSIVE, compare(SoundReading(-27.0, 2), SoundReading(-30.0, 2)))
+        assertEquals(Comparison.B_QUIETER, compare(SoundReading(-26.99, 2), SoundReading(-30.0, 2)))
+    }
+
+    @Test
     fun changedInputCannotBeCompared() {
         assertEquals(Comparison.DIFFERENT_INPUT, compare(SoundReading(-40.0, 2), SoundReading(-30.0, 3)))
+    }
+
+    @Test
+    fun unknownInputCannotBeComparedEvenWhenBothIdsAreUnknown() {
+        assertEquals(Comparison.DIFFERENT_INPUT, compare(SoundReading(-40.0, null), SoundReading(-30.0, null)))
+        assertEquals(Comparison.DIFFERENT_INPUT, compare(SoundReading(-40.0, 2), SoundReading(-30.0, null)))
+    }
+
+    @Test
+    fun routeTrackerAllowsInitialUnknownRouteButRejectsChangesAfterRouteIsKnown() {
+        val route = AudioRouteTracker()
+        assertTrue(route.observe(null))
+        assertTrue(route.observe(null))
+        assertTrue(route.observe(2))
+        assertTrue(route.observe(2))
+        assertFalse(route.observe(null))
+        assertEquals(2, route.inputId)
+
+        val changedRoute = AudioRouteTracker()
+        assertTrue(changedRoute.observe(2))
+        assertFalse(changedRoute.observe(3))
+    }
+
+    @Test
+    fun repeatAggregationAcceptsConsistentDecisiveRepeats() {
+        val close = SoundReading(-32.0, 2)
+        val quieterA = SoundReading(-36.0, 2)
+        val b = SoundReading(-30.0, 2)
+        assertEquals(
+            Comparison.A_QUIETER,
+            aggregateComparisons(
+                listOf(
+                    ComparisonRound(close, b),
+                    ComparisonRound(quieterA, b),
+                    ComparisonRound(quieterA, b),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun repeatAggregationReportsInconclusiveAndInconsistentResults() {
+        val close = SoundReading(-32.0, 2)
+        val b = SoundReading(-30.0, 2)
+        assertEquals(Comparison.INCONCLUSIVE, aggregateComparisons(listOf(ComparisonRound(close, b))))
+        assertEquals(
+            Comparison.INCONSISTENT,
+            aggregateComparisons(listOf(ComparisonRound(close, b), ComparisonRound(SoundReading(-36.0, 2), b))),
+        )
+        assertEquals(
+            Comparison.INCONSISTENT,
+            aggregateComparisons(
+                listOf(
+                    ComparisonRound(SoundReading(-36.0, 2), b),
+                    ComparisonRound(SoundReading(-24.0, 2), b),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun latestRouteMismatchBlocksAggregationButCanBeReplacedByValidRepeat() {
+        val a = SoundReading(-40.0, 2)
+        val b = SoundReading(-30.0, 3)
+        assertEquals(
+            Comparison.DIFFERENT_INPUT,
+            aggregateComparisons(listOf(ComparisonRound(a, b))),
+        )
+        assertEquals(
+            Comparison.A_QUIETER,
+            aggregateComparisons(
+                listOf(
+                    ComparisonRound(a, b),
+                    ComparisonRound(a, SoundReading(-30.0, 2)),
+                ),
+            ),
+        )
     }
 
     @Test

@@ -1,6 +1,7 @@
 <resources>
     <string name="title">Compare noise</string>
-    <string name="introduction">Measure sound for 10 seconds in two places. Keep your phone in the same position and avoid speaking during each measurement.</string>
+    <string name="introduction">Measure for 10 seconds at each place. Keep your phone in a similar position and orientation, leave the microphone uncovered, avoid speaking, and do not change the audio input or accessories.</string>
+    <string name="measurement_guidance">Keep your phone still, leave the microphone uncovered, and do not change the audio input or accessories.</string>
     <string name="privacy">The microphone is active only during measurement. The app works offline and saves no audio.</string>
     <string name="point_a">Point A</string>
     <string name="point_b">Point B</string>
@@ -14,12 +15,17 @@
     <string name="measuring">Measuring %1$s</string>
     <string name="cancel">Cancel measurement</string>
     <string name="reset">End comparison</string>
-    <string name="less_a">Less sound captured at point A</string>
-    <string name="less_b">Less sound captured at point B</string>
     <string name="inconclusive">Inconclusive difference</string>
-    <string name="inconclusive_detail">The captured levels were close. You can measure again.</string>
+    <string name="inconclusive_detail">The levels were close. If you like, repeat one or both points to check consistency.</string>
+    <string name="inconsistent">Measurements varied; there is no clear result.</string>
+    <string name="inconsistent_detail">Repeated readings were not consistent. You can measure one or both points again.</string>
+    <string name="repeat_a">Repeat A</string>
+    <string name="repeat_b">Repeat B</string>
+    <string name="repeat_both">Repeat both points</string>
+    <string name="point_label">Name for %1$s (optional)</string>
+    <string name="less_at_point">Less sound captured at %1$s</string>
     <string name="comparison_detail">Relative comparison using the same phone.</string>
-    <string name="mismatch">The microphone changed. Measure both points again using the same audio input.</string>
+    <string name="mismatch">The same audio input could not be confirmed at both points. Check the connection and measure again.</string>
     <string name="permission_denied">Allow microphone access to measure sound. You can also grant permission in the app settings.</string>
     <string name="settings">Open app settings</string>
     <string name="capture_error">Could not measure sound. Check that the microphone is available and try again.</string>
